@@ -27,7 +27,8 @@
 
 #define MAXBUF	10 * 1024 
 
-int sock; 
+int sock;
+int sock2;
 // ./server catch 3000
 main(argc,argv)
 char **argv;
