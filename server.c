@@ -2,8 +2,7 @@
  * udpserver.c
  *
  * This is an example TCP/IP UDP socket server.
- * It will read packets sent to 'portno' and write them back
- * to the sender.  It has no reliability functions.
+ * It will read packets sent to 'portno'.
  * It will loop forever and must be killed in order to make
  * it terminate.
  *
