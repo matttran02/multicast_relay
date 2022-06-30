@@ -9,6 +9,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -20,14 +21,14 @@
 
 #define TRUE 1
 #define FALSE 0
-
+#define SIZE 6
 #define ACK  'z'
 
 
 #define MAXBUF	10 * 1024 
 
 int sock; 
-
+// ./server catch 3000
 main(argc,argv)
 char **argv;
 {
@@ -37,15 +38,21 @@ char **argv;
 	int ackvar = ACK;
 	int fromlen;
 	extern int errno;
+	char mode[SIZE];
 	int port;
 	extern int onintr();
 	int current = 0;
 
-	if (argc != 2) {
-		printf("syntax error: udpserver portno &\n");
+	if (argc != 3) {
+		printf("./server mode ['catch' or 'relay'] listen_port\n");
 		exit(1);
 	}
-	port = atoi(argv[1]);
+	mode = argv[1];
+	if(strcomp(mode,"catch") != 0 || strcomp(mode,"relay") != 0){
+	    printf("mode has to be ['catch' or 'relay']\n");
+	    exit(-1);
+	}
+    port = atoi(argv[2]);
 	fromlen = sizeof( struct sockaddr_in ); 
 
 	signal(SIGINT, onintr);
