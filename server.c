@@ -61,7 +61,9 @@ char **argv;
     }
 	mode = argv[1];
     port = atoi(argv[2]);
-	port2 = atoi(argv[3]);
+    if(strcmp(argv[1],"relay") == 0 && argc != 4){
+        port2 = atoi(argv[3]);
+    }
 	fromlen = sizeof( struct sockaddr_in ); 
 
 	signal(SIGINT, onintr);
