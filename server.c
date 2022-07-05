@@ -6,7 +6,7 @@
  * It will loop forever and must be killed in order to make
  * it terminate.
  *
- * This is the july_5_07 branch
+ * This is the july_5_08 branch
  *
  */
 
