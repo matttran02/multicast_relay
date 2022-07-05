@@ -47,16 +47,19 @@ char **argv;
 	int port2;
 	extern int onintr();
 	int current = 0;
-
-	if (argc != 4) {
-		printf("./server mode ['catch' or 'relay'] listen_port send_port\n");
-		exit(1);
+	if (argc != 4 && argc != 3) {
+        printf("Error needs to be 3 or 4 arguments\n");
+        exit(-1);
 	}
+    else if(strcmp(argv[1],"catch") == 0 && argc != 3){
+        printf("mode has to be ['catch'] listen_port\n");
+        exit(-1);
+    }
+    else if(strcmp(argv[1],"relay") == 0 && argc != 4){
+        printf("mode has to be ['relay'] listen_port send_port\n");
+        exit(-1);
+    }
 	mode = argv[1];
-	if(strcmp(mode,"catch") != 0 && strcmp(mode,"relay") != 0){
-	    printf("mode has to be ['catch' or 'relay']\n");
-	    exit(-1);
-	}
     port = atoi(argv[2]);
 	port2 = atoi(argv[3]);
 	fromlen = sizeof( struct sockaddr_in ); 
@@ -66,24 +69,23 @@ char **argv;
 	/* create INTERNET, udp datagram socket
 	*/
 	sock = socket(AF_INET, SOCK_DGRAM, 0);
-    sock2 = socket(AF_INET, SOCK_DGRAM, 0);
+//    sock2 = socket(AF_INET, SOCK_DGRAM, 0);
 
     if ( sock < 0 ) {
 		perror("udp server: socket call\n");
 		exit(1);
 	}
-    if ( sock2 < 0 ) {
-        perror("udp server: socket2 call\n");
-        exit(1);
-    }
-
+//    if ( sock2 < 0 ) {
+//        perror("udp server: socket2 call\n");
+//        exit(1);
+//    }
 
 	server.sin_family = AF_INET;
 	server.sin_addr.s_addr = INADDR_ANY;   /* ok from any machine */
 	server.sin_port = htons(port);      /* specific port */
-    server2.sin_family = AF_INET;
-    server2.sin_addr.s_addr = INADDR_ANY;   /* ok from any machine */
-    server2.sin_port = htons(port2);
+//    server2.sin_family = AF_INET;
+//    server2.sin_addr.s_addr = INADDR_ANY;   /* ok from any machine */
+//    server2.sin_port = htons(port2);   /* second port */
 
 	/* bind protocol to socket
 	*/
@@ -91,10 +93,6 @@ char **argv;
 		perror("binding udp socket\n");
 		exit(1);
 	}
-    if (bind(sock2, &server2, sizeof(server2))) {
-        perror("binding udp socket\n");
-        exit(1);
-    }
 
 	for ( ;; ) {     /* do forever */
 		int rc;
@@ -108,16 +106,20 @@ char **argv;
 		printf("udpserver: got packet %d: ", current);
 		printFrom(&from);
 
-		if( sendto(sock2,&ackvar,sizeof(long), 0,
-			&from,sizeof (struct sockaddr_in)) < 0 ) {
-			perror("sendto");
-			if (errno == ENOBUFS)
-				continue;
-			exit(1);
-		}
-		current++;
-
-	}
+        if(strcmp(mode,"relay") == 0){
+////            if( sendto(sock2,&ackvar,sizeof(long), 0,
+////                    &from,sizeof (struct sockaddr_in)) < 0 ) {
+////                    perror("sendto socket2");
+////                    if (errno == ENOBUFS)
+////                        continue;
+////                    exit(1);
+////            }
+//
+            current++;
+        }
+        if(strcmp(mode,"catch") == 0){
+            current++;
+        }
 	/* can't get here, but just in case: close sockets
 	*/
 	close(sock);
