@@ -120,6 +120,7 @@ char **argv;
         if(strcmp(mode,"catch") == 0){
             current++;
         }
+	}
 	/* can't get here, but just in case: close sockets
 	*/
 	close(sock);
