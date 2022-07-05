@@ -109,13 +109,13 @@ char **argv;
 		printFrom(&from);
 
         if(strcmp(mode,"relay") == 0){
-////            if( sendto(sock2,&ackvar,sizeof(long), 0,
-////                    &from,sizeof (struct sockaddr_in)) < 0 ) {
-////                    perror("sendto socket2");
-////                    if (errno == ENOBUFS)
-////                        continue;
-////                    exit(1);
-////            }
+//            if( sendto(sock2,&ackvar,sizeof(long), 0,
+//                    &from,sizeof (struct sockaddr_in)) < 0 ) {
+//                    perror("sendto socket2");
+//                    if (errno == ENOBUFS)
+//                        continue;
+//                    exit(1);
+//            }
 //
             current++;
         }
