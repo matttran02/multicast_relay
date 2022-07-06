@@ -6,12 +6,14 @@
  * It will loop forever and must be killed in order to make
  * it terminate.
  *
- * This is the july_5_07 branch
+ * This is the july_5_08 branch. Code Testing 2
  *
  */
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -19,6 +21,7 @@
 #include <sys/types.h>
 #include <sys/times.h>
 #include <errno.h>
+#include <sys/uio.h>
 #include <signal.h>
 
 #define TRUE 1
@@ -32,8 +35,8 @@
 int sock;
 int sock2;
 // ./server catch 3000
-main(argc,argv)
-char **argv;
+
+int main(int argc,char **argv)
 {
 	struct sockaddr_in server;
 	struct sockaddr_in server2;
@@ -45,6 +48,12 @@ char **argv;
 	char *mode;
 	int port;
 	int port2;
+    int rc;
+    const char* hostname;
+    const char* port_num;
+    struct addrinfo* res;
+    int err;
+    int fd;
 	extern int onintr();
 	int current = 0;
 	if (argc != 4 && argc != 3) {
@@ -71,23 +80,15 @@ char **argv;
 	/* create INTERNET, udp datagram socket
 	*/
 	sock = socket(AF_INET, SOCK_DGRAM, 0);
-//    sock2 = socket(AF_INET, SOCK_DGRAM, 0);
 
     if ( sock < 0 ) {
 		perror("udp server: socket call\n");
 		exit(1);
 	}
-//    if ( sock2 < 0 ) {
-//        perror("udp server: socket2 call\n");
-//        exit(1);
-//    }
 
 	server.sin_family = AF_INET;
 	server.sin_addr.s_addr = INADDR_ANY;   /* ok from any machine */
 	server.sin_port = htons(port);      /* specific port */
-//    server2.sin_family = AF_INET;
-//    server2.sin_addr.s_addr = INADDR_ANY;   /* ok from any machine */
-//    server2.sin_port = htons(port2);   /* second port */
 
 	/* bind protocol to socket
 	*/
@@ -97,7 +98,7 @@ char **argv;
 	}
 
 	for ( ;; ) {     /* do forever */
-		int rc;
+		rc = -1;
 
 		if ((rc=recvfrom(sock, buf, MAXBUF, 0, &from, &fromlen)) < 0 ) {
 			printf("server error: errno %d\n",errno);
@@ -109,14 +110,30 @@ char **argv;
 		printFrom(&from);
 
         if(strcmp(mode,"relay") == 0){
-//            if( sendto(sock2,&ackvar,sizeof(long), 0,
-//                    &from,sizeof (struct sockaddr_in)) < 0 ) {
-//                    perror("sendto socket2");
-//                    if (errno == ENOBUFS)
-//                        continue;
-//                    exit(1);
-//            }
-//
+            hostname = 0; /* localhost */
+            port_num = argv[3];
+            struct addrinfo hints;
+            memset(&hints,0,sizeof(hints));
+            hints.ai_family = AF_INET;
+            hints.ai_socktype = SOCK_DGRAM;
+            hints.ai_protocol = 0;
+            hints.ai_flags = AI_ADDRCONFIG;
+            res = 0;
+            err = getaddrinfo(hostname,port_num,&hints,&res);
+            if (err != 0) {
+                printf("failed to resolve remote socket address (err=%d)",err);
+                exit(-1);
+            }
+            fd=socket(res->ai_family,res->ai_socktype,res->ai_protocol);
+            if (fd == -1) {
+                printf("%s",strerror(errno));
+                exit(-1);
+            }
+            if (sendto(fd,buf,sizeof(buf),0,
+                       res->ai_addr,res->ai_addrlen)==-1) {
+                printf("%s",strerror(errno));
+                exit(-1);
+            }
             current++;
         }
         if(strcmp(mode,"catch") == 0){
