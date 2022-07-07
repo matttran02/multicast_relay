@@ -135,8 +135,8 @@ int main(int argc,char **argv)
 //            }
             if (sendto(fd,buf,sizeof(buf),0,
                        res->ai_addr,res->ai_addrlen)==-1) {
-//                printf("%s",strerror(errno));
-//                exit(-1);
+                printf("%s",strerror(errno));
+                exit(-1);
             }
             current++;
         }
