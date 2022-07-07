@@ -129,10 +129,10 @@ int main(int argc,char **argv)
                 exit(-1);
             }
             fd = socket(res -> ai_family,res -> ai_socktype,res -> ai_protocol);
-//            if (fd == -1) {
-//                printf("%s",strerror(errno));
-//                exit(-1);
-//            }
+            if (fd == -1) {
+                printf("%s",strerror(errno));
+                exit(-1);
+            }
             if (sendto(fd,buf,sizeof(buf),0,
                        res->ai_addr,res->ai_addrlen) == -1) {
                 printf("%s",strerror(errno));
