@@ -143,8 +143,9 @@ int main(int argc,char **argv)
         if(strcmp(mode,"catch") == 0){
             current++;
         }
-        close(sock);
+
 	}
+    close(sock);
 	/* can't get here, but just in case: close sockets
 	*/
 	return(0);
