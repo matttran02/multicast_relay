@@ -102,7 +102,7 @@ int main(int argc,char **argv)
 
 	for ( ;; ) {     /* do forever */
 		rc = -1;
-
+        fd = -1;
 		if ((rc=recvfrom(sock, buf, MAXBUF, 0, &from, &fromlen)) < 0 ) {
 			printf("server error: errno %d\n",errno);
 			perror("reading datagram");
@@ -128,7 +128,7 @@ int main(int argc,char **argv)
                 printf("failed to resolve remote socket address (err=%d)",err);
                 exit(-1);
             }
-            fd=socket(res->ai_family,res->ai_socktype,res->ai_protocol);
+            fd = socket(res -> ai_family,res -> ai_socktype,res -> ai_protocol);
 //            if (fd == -1) {
 //                printf("%s",strerror(errno));
 //                exit(-1);
