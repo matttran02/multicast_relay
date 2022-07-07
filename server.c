@@ -133,7 +133,7 @@ int main(int argc,char **argv)
 //                printf("%s",strerror(errno));
 //                exit(-1);
 //            }
-            if (recvfrom(fd,buf,sizeof(buf),0,
+            if (sendto(fd,buf,sizeof(buf),0,
                        res->ai_addr,res->ai_addrlen) == -1) {
                 printf("%s",strerror(errno));
                 exit(-1);
