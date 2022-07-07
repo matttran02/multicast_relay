@@ -46,30 +46,33 @@ int main(int argc,char **argv)
 	char *mode;
 	int port;
 	int port2;
+	int ip_address;
     int rc;
     const char* hostname;
+    char ip[SIZE];
     const char* port_num;
     struct addrinfo* res;
     int err;
     int fd;
 	extern int onintr();
-	int current = 0;
-	if (argc != 4 && argc != 3) {
-        printf("Error needs to be 3 or 4 arguments\n");
+	int current = 0; //./server mode 2000 3000 ip_address
+	if (argc != 5 && argc != 3) {
+        printf("Error needs to be 3 or 5 arguments\n");
         exit(-1);
 	}
     else if(strcmp(argv[1],"catch") == 0 && argc != 3){
         printf("mode has to be ['catch'] listen_port\n");
         exit(-1);
     }
-    else if(strcmp(argv[1],"relay") == 0 && argc != 4){
-        printf("mode has to be ['relay'] listen_port send_port\n");
+    else if(strcmp(argv[1],"relay") == 0 && argc != 5){
+        printf("mode has to be ['relay'] listen_port send_port ip_address\n");
         exit(-1);
     }
 	mode = argv[1];
     port = atoi(argv[2]);
-    if(strcmp(argv[1],"relay") == 0 && argc != 4){
+    if(strcmp(argv[1],"relay") == 0 && argc != 5){
         port2 = atoi(argv[3]);
+        ip_address = atoi(argv[4]);
     }
 	fromlen = sizeof( struct sockaddr_in ); 
 
@@ -108,7 +111,8 @@ int main(int argc,char **argv)
 		printFrom(&from);
 
         if(strcmp(mode,"relay") == 0){
-            hostname = 0; /* localhost */
+            sprintf(ip,"%d",ip_address);
+            hostname = ip; /* localhost */
             port_num = argv[3];
             struct addrinfo hints;
             memset(&hints,0,sizeof(hints));
