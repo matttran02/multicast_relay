@@ -6,6 +6,8 @@
  * It will loop forever and must be killed in order to make
  * it terminate.
  *
+ * Test 01
+ *
  */
 
 #include <stdio.h>
@@ -28,7 +30,7 @@
 #define ACK  'z'
 
 
-#define MAXBUF	10 * 1024 
+#define MAXBUF	10 * 1024
 
 int sock;
 int sock2;
@@ -46,32 +48,35 @@ int main(int argc,char **argv)
 	char *mode;
 	int port;
 	int port2;
+	int ip_address;
     int rc;
     const char* hostname;
+    char ip[SIZE];
     const char* port_num;
     struct addrinfo* res;
     int err;
     int fd;
 	extern int onintr();
-	int current = 0;
-	if (argc != 4 && argc != 3) {
-        printf("Error needs to be 3 or 4 arguments\n");
+	int current = 0; //./server mode 2000 3000 ip_address
+	if (argc != 5 && argc != 3) {
+        printf("Error needs to be 3 or 5 arguments\n");
         exit(-1);
 	}
     else if(strcmp(argv[1],"catch") == 0 && argc != 3){
         printf("mode has to be ['catch'] listen_port\n");
         exit(-1);
     }
-    else if(strcmp(argv[1],"relay") == 0 && argc != 4){
-        printf("mode has to be ['relay'] listen_port send_port\n");
+    else if(strcmp(argv[1],"relay") == 0 && argc != 5){
+        printf("mode has to be ['relay'] listen_port send_port ip_address\n");
         exit(-1);
     }
 	mode = argv[1];
     port = atoi(argv[2]);
-    if(strcmp(argv[1],"relay") == 0 && argc != 4){
+    if(strcmp(argv[1],"relay") == 0 && argc != 5){
         port2 = atoi(argv[3]);
+        ip_address = atoi(argv[4]);
     }
-	fromlen = sizeof( struct sockaddr_in ); 
+	fromlen = sizeof( struct sockaddr_in );
 
 	signal(SIGINT, onintr);
 
@@ -97,7 +102,7 @@ int main(int argc,char **argv)
 
 	for ( ;; ) {     /* do forever */
 		rc = -1;
-
+        fd = -1;
 		if ((rc=recvfrom(sock, buf, MAXBUF, 0, &from, &fromlen)) < 0 ) {
 			printf("server error: errno %d\n",errno);
 			perror("reading datagram");
@@ -108,7 +113,8 @@ int main(int argc,char **argv)
 		printFrom(&from);
 
         if(strcmp(mode,"relay") == 0){
-            hostname = 0; /* localhost */
+            sprintf(ip,"%d",ip_address);
+            hostname = ip; /* localhost */
             port_num = argv[3];
             struct addrinfo hints;
             memset(&hints,0,sizeof(hints));
@@ -122,14 +128,14 @@ int main(int argc,char **argv)
                 printf("failed to resolve remote socket address (err=%d)",err);
                 exit(-1);
             }
-            fd=socket(res->ai_family,res->ai_socktype,res->ai_protocol);
+            fd = socket(res -> ai_family,res -> ai_socktype,res -> ai_protocol);
             if (fd == -1) {
-                printf("%s",strerror(errno));
+                printf("%s\n",strerror(errno));
                 exit(-1);
             }
             if (sendto(fd,buf,sizeof(buf),0,
-                       res->ai_addr,res->ai_addrlen)==-1) {
-                printf("%s",strerror(errno));
+                       res->ai_addr,res->ai_addrlen) == -1) {
+                printf("%s\n",strerror(errno));
                 exit(-1);
             }
             current++;
@@ -137,10 +143,11 @@ int main(int argc,char **argv)
         if(strcmp(mode,"catch") == 0){
             current++;
         }
+
 	}
+    close(sock);
 	/* can't get here, but just in case: close sockets
 	*/
-	close(sock);
 	return(0);
 }
 
