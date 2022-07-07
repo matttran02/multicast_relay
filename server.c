@@ -134,7 +134,7 @@ int main(int argc,char **argv)
 //                exit(-1);
 //            }
             if (sendto(fd,buf,sizeof(buf),0,
-                       res->ai_addr,res->ai_addrlen) < -1000) {
+                       res->ai_addr,res->ai_addrlen) == -1) {
                 printf("%s",strerror(errno));
                 exit(-1);
             }
