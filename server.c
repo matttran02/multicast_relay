@@ -59,9 +59,9 @@ void onintr()
 }
 int main(int argc,char **argv)
 {
-	struct sockaddr_in *server;
-	struct sockaddr_in *server2;
-	struct sockaddr_in *from;
+	struct sockaddr_in server;
+	struct sockaddr_in server2;
+	struct sockaddr_in from;
 	char buf[MAXBUF];
 	int ackvar = ACK;
 	int fromlen;
@@ -110,13 +110,13 @@ int main(int argc,char **argv)
 		exit(1);
 	}
 
-	server->sin_family = AF_INET;
-	server->sin_addr.s_addr = INADDR_ANY;   /* ok from any machine */
-	server->sin_port = htons(port);      /* specific port */
+	server.sin_family = AF_INET;
+	server.sin_addr.s_addr = INADDR_ANY;   /* ok from any machine */
+	server.sin_port = htons(port);      /* specific port */
 
 	/* bind protocol to socket
 	*/
-	if (bind(sock, server, sizeof(&server))) {
+	if (bind(sock, &server, sizeof(server))) {
 		perror("binding udp socket\n");
 		exit(1);
 	}
@@ -124,14 +124,14 @@ int main(int argc,char **argv)
 	for ( ;; ) {     /* do forever */
 		rc = -1;
         fd = -1;
-		if ((rc=recvfrom(sock, buf, MAXBUF, 0, from, &fromlen)) < 0 ) {
+		if ((rc=recvfrom(sock, buf, MAXBUF, 0, &from, &fromlen)) < 0 ) {
 			printf("server error: errno %d\n",errno);
 			perror("reading datagram");
 			exit(1);
 		}
 
 		printf("udpserver: got packet %d: ", current);
-		printFrom(from);
+		printFrom(&from);
 
         if(strcmp(mode,"relay") == 0){
             sprintf(ip,"%d",ip_address);
