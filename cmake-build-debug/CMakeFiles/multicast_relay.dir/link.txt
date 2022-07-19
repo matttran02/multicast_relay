@@ -1,0 +1,3 @@
+"C:\Users\mattt\OneDrive\Desktop\CLion 2020.3.2\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\multicast_relay.dir/objects.a
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\ar.exe cr CMakeFiles\multicast_relay.dir/objects.a @CMakeFiles\multicast_relay.dir\objects1.rsp
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\gcc.exe -g   -Wl,--whole-archive CMakeFiles\multicast_relay.dir/objects.a -Wl,--no-whole-archive  -o multicast_relay.exe -Wl,--out-implib,libmulticast_relay.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\multicast_relay.dir\linklibs.rsp
