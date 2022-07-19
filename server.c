@@ -116,7 +116,7 @@ int main(int argc,char **argv)
 
 	/* bind protocol to socket
 	*/
-	if (bind(sock, &server, sizeof(server))) {
+	if (bind(sock, (struct sockaddr *)&server, sizeof(server))) {
 		perror("binding udp socket\n");
 		exit(1);
 	}
@@ -124,7 +124,7 @@ int main(int argc,char **argv)
 	for ( ;; ) {     /* do forever */
 		rc = -1;
         fd = -1;
-		if ((rc=recvfrom(sock, buf, MAXBUF, 0, &from, &fromlen)) < 0 ) {
+		if ((rc=recvfrom(sock, buf, MAXBUF, 0, (struct sockaddr *)&from, &fromlen)) < 0 ) {
 			printf("server error: errno %d\n",errno);
 			perror("reading datagram");
 			exit(1);
