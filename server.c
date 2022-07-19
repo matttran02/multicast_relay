@@ -6,7 +6,7 @@
  * It will loop forever and must be killed in order to make
  * it terminate.
  *
- * Test 01
+ * Test 012
  *
  */
 
@@ -35,7 +35,28 @@
 int sock;
 int sock2;
 // ./server catch 3000
+void printFrom(from)
+struct sockaddr_in *from;
+{
+    char *ns;
+    struct hostent *gethostbyaddr();
+    struct hostent *h;
+    char *inet_ntoa();
 
+    fprintf(stdout,": client port %d: ",from->sin_port&0xffff);
+    /* convert inet number to inet network string
+    */
+    ns = inet_ntoa(from->sin_addr);
+    /*
+    h = gethostbyaddr(ns,sizeof(ns),AF_INET);
+    */
+    fprintf(stdout,"client ip addr: %s\n",ns);
+}
+void onintr()
+{
+    close(sock);
+    exit(0);
+}
 int main(int argc,char **argv)
 {
 	struct sockaddr_in server;
@@ -56,7 +77,7 @@ int main(int argc,char **argv)
     struct addrinfo* res;
     int err;
     int fd;
-	extern int onintr();
+	extern void onintr();
 	int current = 0; //./server mode 2000 3000 ip_address
 	if (argc != 5 && argc != 3) {
         printf("Error needs to be 3 or 5 arguments\n");
@@ -95,7 +116,7 @@ int main(int argc,char **argv)
 
 	/* bind protocol to socket
 	*/
-	if (bind(sock, &server, sizeof(server))) {
+	if (bind(sock, (struct sockaddr *)&server, sizeof(server))) {
 		perror("binding udp socket\n");
 		exit(1);
 	}
@@ -103,7 +124,7 @@ int main(int argc,char **argv)
 	for ( ;; ) {     /* do forever */
 		rc = -1;
         fd = -1;
-		if ((rc=recvfrom(sock, buf, MAXBUF, 0, &from, &fromlen)) < 0 ) {
+		if ((rc=recvfrom(sock, buf, MAXBUF, 0, (struct sockaddr *)&from, &fromlen)) < 0 ) {
 			printf("server error: errno %d\n",errno);
 			perror("reading datagram");
 			exit(1);
@@ -134,7 +155,7 @@ int main(int argc,char **argv)
                 exit(-1);
             }
             if (sendto(fd,buf,sizeof(buf),0,
-                       res->ai_addr,res->ai_addrlen) == -1) {
+                       res -> ai_addr,res -> ai_addrlen) == -1) {
                 printf("%s\n",strerror(errno));
                 exit(-1);
             }
@@ -152,26 +173,5 @@ int main(int argc,char **argv)
 }
 
 
-printFrom(from)
-struct sockaddr_in *from;
-{
-	char *ns;
-	struct hostent *gethostbyaddr();
-	struct hostent *h;
-	char *inet_ntoa();
 
-	fprintf(stdout,": client port %d: ",from->sin_port&0xffff);
-	/* convert inet number to inet network string
-	*/
-	ns = inet_ntoa(from->sin_addr);
-	/*
-	h = gethostbyaddr(ns,sizeof(ns),AF_INET);
-	*/
-	fprintf(stdout,"client ip addr: %s\n",ns);
-}
 
-onintr()
-{
-	close(sock);
-	exit(0);
-}
