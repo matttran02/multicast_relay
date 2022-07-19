@@ -35,7 +35,7 @@
 int sock;
 int sock2;
 // ./server catch 3000
-printFrom(from)
+void printFrom(from)
 struct sockaddr_in *from;
 {
     char *ns;
