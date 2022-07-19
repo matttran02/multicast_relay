@@ -35,6 +35,23 @@
 int sock;
 int sock2;
 // ./server catch 3000
+printFrom(from)
+struct sockaddr_in *from;
+{
+    char *ns;
+    struct hostent *gethostbyaddr();
+    struct hostent *h;
+    char *inet_ntoa();
+
+    fprintf(stdout,": client port %d: ",from->sin_port&0xffff);
+    /* convert inet number to inet network string
+    */
+    ns = inet_ntoa(from->sin_addr);
+    /*
+    h = gethostbyaddr(ns,sizeof(ns),AF_INET);
+    */
+    fprintf(stdout,"client ip addr: %s\n",ns);
+}
 void onintr()
 {
     close(sock);
@@ -114,7 +131,7 @@ int main(int argc,char **argv)
 		}
 
 		printf("udpserver: got packet %d: ", current);
-		printf(&from);
+		printFrom(&from);
 
         if(strcmp(mode,"relay") == 0){
             sprintf(ip,"%d",ip_address);
@@ -156,21 +173,5 @@ int main(int argc,char **argv)
 }
 
 
-printf(from);
-struct sockaddr_in *from;
-{
-	char *ns;
-	struct hostent *gethostbyaddr();
-	struct hostent *h;
-	char *inet_ntoa();
 
-	fprintf(stdout,": client port %d: ",from->sin_port&0xffff);
-	/* convert inet number to inet network string
-	*/
-	ns = inet_ntoa(from->sin_addr);
-	/*
-	h = gethostbyaddr(ns,sizeof(ns),AF_INET);
-	*/
-	fprintf(stdout,"client ip addr: %s\n",ns);
-}
 
