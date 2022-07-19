@@ -114,7 +114,7 @@ int main(int argc,char **argv)
 		}
 
 		printf("udpserver: got packet %d: ", current);
-		printFrom(&from);
+		printf(&from);
 
         if(strcmp(mode,"relay") == 0){
             sprintf(ip,"%d",ip_address);
@@ -156,7 +156,7 @@ int main(int argc,char **argv)
 }
 
 
-printFrom(from)
+printf(from);
 struct sockaddr_in *from;
 {
 	char *ns;
