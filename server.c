@@ -35,7 +35,11 @@
 int sock;
 int sock2;
 // ./server catch 3000
-
+void onintr()
+{
+    close(sock);
+    exit(0);
+}
 int main(int argc,char **argv)
 {
 	struct sockaddr_in server;
@@ -56,7 +60,7 @@ int main(int argc,char **argv)
     struct addrinfo* res;
     int err;
     int fd;
-	extern int onintr();
+	extern void onintr();
 	int current = 0; //./server mode 2000 3000 ip_address
 	if (argc != 5 && argc != 3) {
         printf("Error needs to be 3 or 5 arguments\n");
@@ -134,7 +138,7 @@ int main(int argc,char **argv)
                 exit(-1);
             }
             if (sendto(fd,buf,sizeof(buf),0,
-                       res->ai_addr,res->ai_addrlen) == -1) {
+                       res -> ai_addr,res -> ai_addrlen) == -1) {
                 printf("%s\n",strerror(errno));
                 exit(-1);
             }
@@ -170,8 +174,3 @@ struct sockaddr_in *from;
 	fprintf(stdout,"client ip addr: %s\n",ns);
 }
 
-onintr()
-{
-	close(sock);
-	exit(0);
-}
