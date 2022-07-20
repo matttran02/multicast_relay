@@ -66,7 +66,8 @@ int main(int argc,char **argv)
 	int ackvar = ACK;
 	int fromlen;
 	extern int errno;
-	char *mode;
+	char *url;
+	char *udp;
 	int port;
 	int port2;
 	int ip_address;
@@ -77,26 +78,33 @@ int main(int argc,char **argv)
     struct addrinfo* res;
     int err;
     int fd;
+    int i = 6;
+    int j = 0;
+    char send_port[5];
 	extern void onintr();
 	int current = 0; //./server mode 2000 3000 ip_address
-	if (argc != 5 && argc != 3) {
-        printf("Error needs to be 3 or 5 arguments\n");
+	if (argc != 2) {
+        printf("Error, the command line needs to be 2 arguments\nExample: ./server udp://127.0.0.1:5000\n");
         exit(-1);
 	}
-    else if(strcmp(argv[1],"catch") == 0 && argc != 3){
-        printf("mode has to be ['catch'] listen_port\n");
-        exit(-1);
+	url = argv[1];
+    port = 2000;
+    strncat(udp,url,6);
+    if(strcmp(udp,"udp://") != 0){
+        printf("URL error\n");
     }
-    else if(strcmp(argv[1],"relay") == 0 && argc != 5){
-        printf("mode has to be ['relay'] listen_port send_port ip_address\n");
-        exit(-1);
+    memset(ip,0,15);
+    while(url[i] != ':'){
+        ip[i-6] = url[i];
+        i++;
     }
-	mode = argv[1];
-    port = atoi(argv[2]);
-    if(strcmp(argv[1],"relay") == 0 && argc != 5){
-        port2 = atoi(argv[3]);
-        ip_address = atoi(argv[4]);
+    i++;
+    while(i < strlen(url)){
+        send_port[j] = url[i];
+        i++;
+        j++;
     }
+    send_port[j] = '\0';
 	fromlen = sizeof( struct sockaddr_in );
 
 	signal(SIGINT, onintr);
@@ -133,37 +141,34 @@ int main(int argc,char **argv)
 		printf("udpserver: got packet %d: ", current);
 		printFrom(&from);
 
-        if(strcmp(mode,"relay") == 0){
-            sprintf(ip,"%d",ip_address);
-            hostname = ip; /* localhost */
-            port_num = argv[3];
-            struct addrinfo hints;
-            memset(&hints,0,sizeof(hints));
-            hints.ai_family = AF_INET;
-            hints.ai_socktype = SOCK_DGRAM;
-            hints.ai_protocol = 0;
-            hints.ai_flags = AI_ADDRCONFIG;
-            res = 0;
-            err = getaddrinfo(hostname,port_num,&hints,&res);
-            if (err != 0) {
-                printf("failed to resolve remote socket address (err=%d)",err);
-                exit(-1);
-            }
-            fd = socket(res -> ai_family,res -> ai_socktype,res -> ai_protocol);
-            if (fd == -1) {
-                printf("%s\n",strerror(errno));
-                exit(-1);
-            }
-            if (sendto(fd,buf,sizeof(buf),0,
-                       res -> ai_addr,res -> ai_addrlen) == -1) {
-                printf("%s\n",strerror(errno));
-                exit(-1);
-            }
-            current++;
+        sprintf(ip,"%d",ip_address);
+        hostname = ip; /* localhost */
+//        port_num = argv[3];
+        struct addrinfo hints;
+        memset(&hints,0,sizeof(hints));
+        hints.ai_family = AF_INET;
+        hints.ai_socktype = SOCK_DGRAM;
+        hints.ai_protocol = 0;
+        hints.ai_flags = AI_ADDRCONFIG;
+        res = 0;
+        err = getaddrinfo(hostname,send_port,&hints,&res);
+        if (err != 0) {
+            printf("failed to resolve remote socket address (err=%d)",err);
+            exit(-1);
         }
-        if(strcmp(mode,"catch") == 0){
-            current++;
+        fd = socket(res -> ai_family,res -> ai_socktype,res -> ai_protocol);
+        if (fd == -1) {
+            printf("%s\n",strerror(errno));
+            exit(-1);
         }
+        if (sendto(fd,buf,sizeof(buf),0,
+                   res -> ai_addr,res -> ai_addrlen) == -1) {
+            printf("%s\n",strerror(errno));
+            exit(-1);
+        }
+        current++;
+
+
 
 	}
     close(sock);
