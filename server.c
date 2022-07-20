@@ -67,7 +67,7 @@ int main(int argc,char **argv)
 	int fromlen;
 	extern int errno;
 	char *url;
-	char *udp;
+	char udp[7];
 	int port;
 	int port2;
 	int ip_address;
@@ -78,7 +78,7 @@ int main(int argc,char **argv)
     struct addrinfo* res;
     int err;
     int fd;
-    int i = 6;
+    int i = 0;
     int j = 0;
     char send_port[5];
 	extern void onintr();
@@ -89,7 +89,11 @@ int main(int argc,char **argv)
 	}
 	url = argv[1];
     port = 2000;
-    strncat(udp,url,6);
+    memset(udp,0,7);
+    while(i < 6){
+        udp[i] = url[i];
+        i++;
+    }
     if(strcmp(udp,"udp://") != 0){
         printf("URL error\n");
     }
